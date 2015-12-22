@@ -10,7 +10,7 @@ function [idx, C, sumD, D] = Ckmeans(X, k,weight, varargin)
 %   Euclidean distances.
 %
 %   KMEANS treats NaNs as missing data, and ignores any rows of X that
-%   contain NaNs.
+%   contain NaNs. 
 %
 %   [IDX, C] = KMEANS(X, K) returns the K cluster centroid locations in
 %   the K-by-P matrix C.
@@ -150,7 +150,7 @@ if ischar(distance)
               'Unknown ''Distance'' parameter value:  %s.', distance);
     end
     distance = distNames{j};
-    switch distance
+    switch distance 
     case 'cosine'
         Xnorm = sqrt(sum(X.^2, 2));
         if any(min(Xnorm) <= eps(max(Xnorm)))
@@ -221,7 +221,7 @@ elseif isnumeric(start)
         error('stats:kmeans:MisshapedStart', ...
               'The third dimension of the ''Start'' array must match the ''replicates'' parameter value.');
     end
-
+    
     % Need to center explicit starting points for 'correlation'. (Re)normalization
     % for 'cosine'/'correlation' is done at each iteration.
     if isequal(distance, 'correlation')
@@ -324,7 +324,7 @@ for rep = 1:reps
     case 'numeric'
         C = CC(:,:,rep);
     end
-
+    
     % Compute the distance from every point to each cluster centroid and the
     % initial assignment of points to clusters
     D = distfun(X, C, weight,distance, 0);
@@ -332,15 +332,15 @@ for rep = 1:reps
     m = accumarray(idx,1,[k,1]);
 
     try % catch empty cluster errors and move on to next rep
-
+        
         % Begin phase one:  batch reassignments
         converged = batchUpdate();
-
+        
         % Begin phase two:  single reassignments
         if online
             converged = onlineUpdate();
         end
-
+        
         if ~converged
             warning('stats:kmeans:FailedToConverge', ...
                     'Failed to converge in %d iterations%s.',maxit,repsMsg(rep,reps));
@@ -352,7 +352,7 @@ for rep = 1:reps
         d = D((idx-1)*n + (1:n)');
         sumD = accumarray(idx,d,[k,1]);
         totsumD = sum(sumD);
-
+        
         if display > 1 % 'final' or 'iter'
             disp(sprintf('%d iterations, total sum of distances = %g',iter,totsumD));
         end
@@ -384,7 +384,7 @@ for rep = 1:reps
             end
         end
     end % catch
-
+    
 end % replicates
 
 % Return the best solution
@@ -718,16 +718,16 @@ nclusts = size(C,1);
 
 switch dist
 case 'sqeuclidean'
-     for i = 1:nclusts
-         D(:,i) = (X(:,1) - C(i,1)).^2;
-         for j = 2:p
-             D(:,i) = D(:,i) + (X(:,j) - C(i,j)).^2;
-         end
-         % D(:,i) = sum((X - C(repmat(i,n,1),:)).^2, 2);
-     end
-    Z = C';
-    D = (bsxfun(@plus,dot(Z, Z, 1)',dot(X',X',1)) - 2*(Z'*X))';
-    D = bsxfun(@times, D, weight);
+%       for i = 1:nclusts
+%           D(:,i) = (X(:,1) - C(i,1)).^2;
+%           for j = 2:p
+%               D(:,i) = D(:,i) + (X(:,j) - C(i,j)).^2;
+%           end
+%           % D(:,i) = sum((X - C(repmat(i,n,1),:)).^2, 2);
+%       end
+     Z = C';
+     D = (bsxfun(@plus,dot(Z, Z, 1)',dot(X',X',1)) - 2*(Z'*X'))';
+     D = bsxfun(@times, D, weight);
 case 'cityblock'
     for i = 1:nclusts
         D(:,i) = abs(X(:,1) - C(i,1));
@@ -743,7 +743,7 @@ case {'cosine','correlation'}
         error('stats:kmeans:ZeroCentroid', ...
               'Zero cluster centroid created at iteration %d.',iter);
     end
-
+    
     for i = 1:nclusts
         D(:,i) = max(1 - X * (C(i,:)./normC(i))', 0);
     end
@@ -813,7 +813,7 @@ end % function
 function [badin,wasnan,varargout]=statremovenan(varargin)
 %STATREMOVENAN Remove NaN values from inputs
 
-%   Copyright 1993-2005 The MathWorks, Inc.
+%   Copyright 1993-2005 The MathWorks, Inc. 
 %   $Revision: 1.3.2.2 $  $Date: 2005/05/31 16:45:15 $
 
 badin = 0;
@@ -824,7 +824,7 @@ n = -1;
 varargout = cell(nargout,1);
 for j=1:nargin
    y = varargin{j};
-   if (size(y,1)==1) && (n~=1)
+   if (size(y,1)==1) && (n~=1) 
        y =  y';
    end
 
@@ -834,7 +834,7 @@ for j=1:nargin
    elseif (n~=ny && ny~=0)
       if (badin==0), badin = j; end
    end
-
+   
    varargout{j} = y;
 
    if (badin==0 && ny>0)
