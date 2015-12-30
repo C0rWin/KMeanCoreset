@@ -9,10 +9,10 @@ classdef Matrix < HandleObject
     %each cluster has a randSubspace of it's own, all saved in this
     %cell array
     randSubspaces
-
+    
     regularSVD=false;
   end % properties
-
+  
   properties(Dependent)
     % Contains a reference to privateMatrix, which is the matrix in
     % a matlab (non-OOP) format.
@@ -21,34 +21,34 @@ classdef Matrix < HandleObject
     %
     % Note: To make Matrix(x,y) call Matrix.matrix(x,y)
     matrix;
-
+    
     m % The same as matrix ( a shorthand)
     nRows % the number of rows in privateMatrix
     nCols % the number of cols in privateMatrix
     n % shorthand for nRows
     d % shorthand for nCols
   end % properties (Dependent)
-
+  
   properties (Access = protected)
     % the j-subspace that minimizes the sum of squared distances to the
     % set of points represented by Matrix. Updated only when
     % getOptSqSubspace is called.
     % j is a propery of optSqSubspace
     optSqSubspace;
-
+    
     %Singular Values of the SVD decomposition of the matrix
     singularVals
-
+    
     % The sum of squard distances from P to optSqSubspace
     optSqDistances;
-
+    
     % The same, for some of squared projections
     optSqProjections;
-
+    
     % see property Matrix
     privateMatrix;
   end % properties (Access = protected)
-
+  
   methods (Access=public)
     function result=isEmpty(obj)
       result= obj.n==0;
@@ -90,8 +90,8 @@ classdef Matrix < HandleObject
       end
       Q = U(:,1:r);
       Q = Matrix(Q);
-
-
+      
+      
       % Here is the old code.  Use it for faster computation, or for
       % generating the same results as earlier versions of MATLAB.
       %             if ~exist('maxR','var')
@@ -107,12 +107,12 @@ classdef Matrix < HandleObject
       %             Q=Matrix(Qfull(:,1:r)); % remove zero vectors
       %             R=Matrix(Rfull(1:r,:)'); % compute coordination on new base
     end % function orth
-
+    
     % get entries from the matrix as a Matrix object
     function result = Mat(obj,rindexes,cindexes)
       result = Matrix(obj.m(rindexes,cindexes));
     end
-
+    
     %get function for the property matrix
     function mat = getRawMatrix(obj)
       mat = obj.m;
@@ -157,7 +157,7 @@ classdef Matrix < HandleObject
           result=Subspace(result,false);
       end % end
       obj.optSqSubspace = result;
-
+      
       %             [~,~,V,flag] = svds(P,j);
       %             result = Matrix(V);
       %             if(flag==1)
@@ -170,8 +170,8 @@ classdef Matrix < HandleObject
       %                     warning('matrix to large for full svd');
       %                 end
       %             end
-
-
+      
+      
       %This implementation maybe faster:
       %             options.issym=true;
       %             options.isreal=true;
@@ -189,7 +189,7 @@ classdef Matrix < HandleObject
       %                 [Uj,~]=eigs(P*P',j,'lm',options);
       %                 nonOrthogonalOptSubspace=P'*Uj;
       %             end % if
-
+      
       % Here we compute an orthogonal base for the optimal subspace.
       % note: 'orth' can be used instead of QR. The running time will be longer, but
       % results are more accurate. see "orth.m"
@@ -197,12 +197,12 @@ classdef Matrix < HandleObject
       %             result=Subspace(result,true); %no need for orth, result is allready orthogonal
       %             obj.optSqSubspace=result;
     end % computeOptSubspace
-
+    
     % Make the matrix an empty matrix ([])
     function clear(obj)
       obj.m=[];
     end % function clear
-
+    
     function r=horzcat(obj1,obj2)
       if isempty(obj1)
         r=Matrix(obj2.m);
@@ -213,17 +213,17 @@ classdef Matrix < HandleObject
     function r=vertcat(obj1,obj2)
       r=Matrix([obj1.m; obj2.m]);
     end
-
+    
     function r = plus(obj1,obj2)
       % MTIMES   Implement obj1 * obj2 for Matrix.
       r = Matrix(obj1.m+obj2.m);
     end % plus
-
+    
     function r = minus(obj1,obj2)
       % MTIMES   Implement obj1 * obj2 for Matrix.
       r = Matrix(obj1.m-obj2.m);
     end % minus
-
+    
     % compute epsilon-grid around the point of the Matrix.
     % works only for 1-line matrix.
     % Put the matrix points of G in the grid and choose representatives
@@ -284,35 +284,35 @@ classdef Matrix < HandleObject
     %                    Q = obj.getRows(idxs);
     %                  end
     %           end
-
+    
     function m=maxDistance(obj,centers)
       P=PointFunctionSet(obj);
       m=P.maxDistance(centers);
     end
-
+    
     function r = mtimes(obj1,obj2)
       % MTIMES   Implement obj1 * obj2 for Matrix.
       r = Matrix(obj1.m*obj2.m);
     end % mtimes
-
+    
     function r=ctranspose(obj)
       r=Matrix(obj.m');
     end
-
+    
     % wrapper for reshape.m
     % A new object is returned. The existing matrix does not change!
     function result=Reshape(obj,varargin)
       result=Matrix(reshape(obj.m,varargin{:}));
     end
-
+    
     function result=Numel(obj)
       result=numel(obj.m);
     end
-
+    
     function result=sub(obj,varargin)
       result=obj.m(varargin{:});
     end
-
+    
     %         function ans = subsasgn(obj, S, B)
     %             if S(1).type ~= '.'
     %                ans=Matrix(subsasgn(obj.m,S,B.m));
@@ -320,16 +320,16 @@ classdef Matrix < HandleObject
     %                 ans = builtin('subsasgn',obj,S,B);
     %             end
     %         end % ans
-
+    
     % Support commands such as Matrix (2:1,3:4).
     % see "help subsrefs".
     %function display(obj)
     %    obj.m
     %end
   end % public methods
-
+  
   methods (Access=protected)
-
+    
     %function [r minError]= rank(~, Q, R)
     function [r minError]= rank(temp, Q, R)
       % (The effective) rank of a matrix Q that returned from QR decomposition, based on
@@ -337,11 +337,11 @@ classdef Matrix < HandleObject
       % stolen from "orth.m"
       tol = 100*eps*norm(Q,'fro');
       absDiagR=abs(diag(R));
-
+      
       % Note: tol might be too small and yield high-dim sets, check on debug
       r = sum(absDiagR> tol);
       r = r(1); % fix for case where R is vector.
-
+      
       % Check that the minimum eigenvalue that is greater than tol
       % is much greater than tol, otherwise tol need to be redefined.
       smallTolIndexes=find(absDiagR> tol);
@@ -356,7 +356,7 @@ classdef Matrix < HandleObject
         %                 minError
       end %if (minError<1000)
     end % function rank
-
+    
     % Check if we already computed the optimal j-subspace for P
     function result=isUpdatedOptSqSubspace(obj, j)
       result=false;
@@ -366,7 +366,7 @@ classdef Matrix < HandleObject
         end % if obj.opstSqSubspace
       end %if ~isempty
     end % function isUpdatedOptSqSubspace
-
+    
     % Check if we already computed the sum of squared distances to the
     % opt j-subspace of P
     function result=isUpdatedOptSqDistances(obj, j)
@@ -375,7 +375,7 @@ classdef Matrix < HandleObject
       else result=false;
       end %if
     end% function isUpdated...
-
+    
     % Same as previous function, for sum of squared projections
     function result=isUpdatedOptSqProjections(obj, j)
       if isUpdatedOptSqSubspace(obj, j) && ~isempty(obj.optSqProjections)
@@ -383,7 +383,7 @@ classdef Matrix < HandleObject
       else result=false;
       end % if
     end % function
-
+    
     %computes optimalSqSubspace for matrices with d<=n
     function result = DsmallerThanN(obj,M,j)
       %            %dense calculation
@@ -401,7 +401,7 @@ classdef Matrix < HandleObject
       Ddiag = diag(DSquared)';
       %[~,indices] = sort(Ddiag,'descend');
       [temp,indices] = sort(Ddiag,'descend');
-
+      
       result = V(:,indices);
       result = result(:,1:j);
       %             sparse calculation
@@ -422,8 +422,8 @@ classdef Matrix < HandleObject
       %             end
       result = sparse(result);
     end
-
-
+    
+    
     % Clear all properties.
     % Used for properties that are computed once and then stored in
     % memory. So they need to be cleared when the matrix is changed.
@@ -432,7 +432,7 @@ classdef Matrix < HandleObject
       obj.optSqProjections=[];
       obj.optSqDistances=[];
     end
-
+    
     % Pad with zeroes the input matrix otherMat
     % or obj's matrix have so that they'l the same number of columns.
     % Used by mergeSparse/Dense
@@ -443,8 +443,8 @@ classdef Matrix < HandleObject
         obj.m(1,size(otherMat.m,2)) = 0;
       end %function sizematch
     end % function matrixSizeMatch(obj,otherMat)
-
-
+    
+    
     function check(Q,E)
       j=E.nCols;
       m=Q.nCols;
@@ -456,7 +456,7 @@ classdef Matrix < HandleObject
         error ('bug');
       end
     end
-
+    
     function result=isDifferent(M1,M2)
       if max(max(M1.m-M2.m))>1e-13%1000*eps
         result=true;
@@ -464,21 +464,21 @@ classdef Matrix < HandleObject
       end
     end
   end % protected methods
-
+  
   methods
     function result=isreal(obj)
       result=1;
     end
-
+    
     % returns row number ind from the matrix
     function result=getRow(obj, ind)
       result=Matrix(obj.m(ind,:));
     end
-
+    
     function result = getRows(obj,indexes)
       result = Matrix(obj.m(indexes,:));
     end
-
+    
     function show3d(obj)
       params.lineWidth =  3   ;    %Line width                      1
       params.viewAngle =[40 17.5];       %Viewing angle                   [40 17.5]
@@ -506,22 +506,22 @@ classdef Matrix < HandleObject
       [tempM,indexes] = samplingAlg.compute(obj.m,sampleSize,repetition);
       result =  Matrix(tempM);
     end
-
+    
     function result=get.m(obj)
       result=obj.matrix;
     end % function set.matrix
     function set.m(obj, in_matrix)
       obj.matrix=in_matrix;
     end % function set.matrix
-
+    
     function result=get.matrix(obj)
       result=obj.getMatrix();
     end % function get.matrix
-
+    
     function result=getMatrix(obj)
       result=obj.privateMatrix;
     end % function set.matrix
-
+    
     % Set new matrix, and remove all the
     % pre-computed values for the old matrix
     function set.matrix(obj, in_matrix)
@@ -540,13 +540,13 @@ classdef Matrix < HandleObject
     function result=get.d(obj)
       result=size(obj.matrix,2);
     end
-
+    
     %adds a randsubspace to randSubspaces
     %randSubspace was changed to randSubspaces due to clusters
     function [] = addRandSubspace(obj,randSubspace)
       obj.randSubspaces = [obj.randSubspaces {randSubspace}];
     end
-
+    
     % varargin = n,d,j,noise
     % Make a random matrix of size n*d, where all the points are lying
     % on a j-dimensional subspace, with additional Gaussian noise added
@@ -560,7 +560,7 @@ classdef Matrix < HandleObject
       obj.matrix=...
         proj*obj.randSubspaces{1}.matrix'+mynoise*randn(myn,myd); %using this function only when there's 1 cluster, u.e 1 randsubspace
     end % function makeRandomNoise
-
+    
     % get subset of columns. Indexes is an array of column numbers.
     % Output is a Matrix
     function result=getCols(obj, indexes)
@@ -572,11 +572,11 @@ classdef Matrix < HandleObject
       obj.matrix=...
         randn(myn,myd);
     end % function makeRandomNoise
-
+    
     function result=isSparse(obj)
       result=or(issparse(obj.m),isempty(obj.m)); %fixed for the case that m= []
     end %function isSparse
-
+    
     % Allocate space and create a new sparse matrix, according to the matrices
     % in varargin. Used before merging varargin with obj's matrix in the constructor.
     function allocBeforeMerge(obj,varargin)
@@ -590,7 +590,7 @@ classdef Matrix < HandleObject
       end % for
       obj.m=spalloc(nAll,dMax,nnzAll);
     end % function allocBeforeMerge(varargin)
-
+    
     % Constructors:
     % Matrix('sparse',n,d,j,nzpr)- create a a sparse random matrix.
     %  (all parameters after 'sparse' are optional). See MakeSparseRandomNoise.
@@ -620,8 +620,8 @@ classdef Matrix < HandleObject
         end % if strcmp
       end %if nargin
     end % constructor
-
-
+    
+    
     % Compute the optimal j-subspace (LMS) or retrive it
     % if was already computed
     function result = getOptSqSubspace(obj,j)
@@ -633,14 +633,14 @@ classdef Matrix < HandleObject
       end % if
       result=obj.optSqSubspace;
     end % function getOptSqSubspace
-
+    
     function [result,selectedIndices] = getApproxSubspace(varargin)
       %improving the optSqSubspace
       %input: varargin{1} = P (input points), varargin{2} = epsilon,
       %varargin{3} = optSqSubspace
       [result,selectedIndices] = ApproxSubspaceAlg.run1(varargin{2:end});
     end
-
+    
     % Compute squared distances to Optimal Subspace,
     % or retreive if were already computed
     function result = getOptSqDistances(obj, j)
@@ -659,7 +659,7 @@ classdef Matrix < HandleObject
         end
       end
     end % function result=getOpt..
-
+    
     % Compute squared projections on OptSubspace or retrieved.
     function result = getOptSqProjections(obj, j)
       if isUpdatedOptSqProjections(obj, j)
@@ -670,25 +670,25 @@ classdef Matrix < HandleObject
         result=obj.optSqProjections;
       end % if
     end % function
-
+    
     % compute sum of squared of the entries in the matrix.
     % Known as frobinues norm
     function [sumOfSquared] = sumOfSquaredEntries(obj)
       % Returns the sum of squared distances of the entries of the matrix P
       sumOfSquared=(norm(obj.matrix,'fro'))^2;
     end % function sumOfSquaredEntries
-
+    
     % Returns a column vector where the i'th entry is the sum of squared
     % entries in the i'th row
     function [result] = squaredRows(obj)
       result= sum(obj.m.^2,2);
     end
-
+    
     % retun a number which is the sum of all entries
     function [sumX] = sumAll(obj)
       sumX=sum(sum(obj.matrix));
     end
-
+    
     function [translatedP] = translate(obj)
       % Translate the rows of P to their center of mass.
       % The new sum of rows is thus zero.
@@ -698,8 +698,8 @@ classdef Matrix < HandleObject
       mean=sum(P)/obj.n;
       translatedP=bsxfun(@minus,P,mean);
     end
-
-
+    
+    
     % Merge the rows of the input sparse matrices to this (obj's) matrix.
     % varargin is a list of sparse matrices.
     % If you want pre-allocation of space, construct a new merged
@@ -712,19 +712,19 @@ classdef Matrix < HandleObject
         %                 cols2=[];
         %                 vals1=[];
         %                 vals2=[];
-
-
+        
+        
         % All input matrices should be sparse
         %                 if(or(obj.nCols ~=0,obj.nRows~=0))
         %                     if(varargin{i}.isSparse~=obj.isSparse)
         %                         error('input sparsity and obj should be the same')
         %                     end
         %                 end
-
+        
         if(isempty(varargin{i}.m))
           continue;
         end
-
+        
         %bugs with sparsity in matlab R2008 fixed
         %                 if(~issparse(obj.m))
         %                     obj.m=sparse(obj.m);
@@ -732,14 +732,14 @@ classdef Matrix < HandleObject
         %                 if(~issparse(varargin{i}.m))
         %                     varargin{i}.m = sparse(varargin{i}.m);
         %                 end
-
+        
         % Number of columns should be the same. Otherwise - pad
         % with zeroes
         if(~isempty(obj.m))
           obj.matrixSizeMatch(varargin{i});
         end
         obj.m = [obj.m; varargin{i}.m];
-
+        
         %sparse merge maybe faster:
         %                 [rows1,cols1,vals1] = find(obj.m);
         %                 [rows2,cols2,vals2] = find(varargin{i}.m);
@@ -761,12 +761,12 @@ classdef Matrix < HandleObject
         %                 catch exception
         %                     do = 1;
         %                 end
-
-
-
+        
+        
+        
       end % for
     end % merge
-
+    
     function makeSparseRandomNoise(obj,varargin)
       % varargin = n,d,j,nzpr (all optional)
       % defaults = 50, 10^6, 1, 5, respectively.
@@ -778,7 +778,7 @@ classdef Matrix < HandleObject
       obj.matrix=...
         sprand(n,d, nzpr/d, ones(1,j));
     end % function makeSparseRandomNoise
-
+    
     % Type = Subspace
     function [sqDists projP]= sqDistances(obj, subspace)
       [sqDists projP]= subspace.sqDistances(obj);
@@ -793,7 +793,7 @@ classdef Matrix < HandleObject
     %                 subspaces = [subspaces tempSubspace];
     %             end
     %         end
-
+    
     function subspace = getSpannedSubspace(obj)
       %this function calculates the standard basis of obj.m (i.e v_i will be all
       %zeros except the i'th element iff there's atlist 1 non zero p in P in
@@ -802,28 +802,28 @@ classdef Matrix < HandleObject
       colSum = sum(obj.m,1);
       indexes = find(colSum ~= 0);
       subspace = sparse(1:length(indexes),indexes,ones(1,length(indexes)),length(indexes),length(colSum));
-
+      
       subspace = subspace';
       subspace = Subspace(Matrix(subspace),false); %wrapping the subspace matrix in subspace class
     end
-
+    
     function []=setSingVals(obj,singVals)
       obj.singularVals = singVals;
     end
-
+    
     function [Q,U,R] = newRotate(Vs,Es)
       %V= Matrix(full(V.m));
       %E=Matrix(full(E.m));
-
+      
       % find base for V and E
       B=Matrix(orth([full(Vs.m) full(Es.m)]));
       V= Matrix(full(B.m'*Vs.m));
       E= Matrix(full(B.m'*Es.m));
-
+      
       Q1=V-E*(E'*V); %E*E' will cause a temp d*d matrix
       Q2=orth(Q1);
       Q=[E Q2];
-
+      
       M1=E-V*(V'*E); %V*V' will cause a temp d*d matrix
       %M2=Subspace(M1);
       M2=orth(M1);
@@ -836,7 +836,7 @@ classdef Matrix < HandleObject
       if size(Q.m,2)~=size(M.m,2)
         error('err');
       end
-
+      
       if nargout >= 3
         if issparse(V.m)
           R = (Matrix(speye(V.nRows,V.nRows)) - Q*Q' ) + Q*U'*Q';
@@ -844,21 +844,21 @@ classdef Matrix < HandleObject
           R = (Matrix(eye(V.nRows,V.nRows)) - Q*Q' ) + Q*U'*Q';
         end
       end
-
+      
     end
-
+    
     %Q&U are the rotation matrices for the method obj.rotate
     %R = I-QQ'+QU'Q'  - the rotation matrix given.
     function [Q,U,R] = getRotateMatrix(V,E)
       %V= Matrix(full(V.m));
       %E=Matrix(full(E.m));
-
+      
       % find base for V and E
       Q1=V-E*(E'*V); %E*E' will cause a temp d*d matrix
       Q1.m=full(Q1.m);
       Q2=orth(Q1);
       Q=[E Q2];
-
+      
       M1=E-V*(V'*E); %V*V' will cause a temp d*d matrix
       %M2=Subspace(M1);
       M1.m=full(M1.m);
@@ -869,7 +869,7 @@ classdef Matrix < HandleObject
       if size(Q.m,2)~=size(M.m,2)
         error('err');
       end
-
+      
       if nargout >= 3
         if issparse(V.m)
           R = (Matrix(speye(V.nRows,V.nRows)) - Q*Q' ) + Q*U'*Q';
@@ -877,9 +877,9 @@ classdef Matrix < HandleObject
           R = (Matrix(eye(V.nRows,V.nRows)) - Q*Q' ) + Q*U'*Q';
         end
       end
-
+      
     end
-
+    
     function rotated = rotate(obj,Q,U)
       P = obj';
       projCoordinates=Q'*P;
@@ -894,7 +894,7 @@ classdef Matrix < HandleObject
       clear fullProj;
       rotated = rotated';
     end
-
+    
     function distance = distancesTopoint(obj,c)
       %Compute the distances from the points in obj to a specific
       %point.
@@ -903,7 +903,7 @@ classdef Matrix < HandleObject
       DifferenceMatrix = bsxfun(@minus, obj.m, c);
       distance = sum( DifferenceMatrix.^2, 2);
     end
-
+    
     % find indexes of the given input points
     function idxs=indexesFromData(obj, subset)
       a=1; % pointer on the full set
