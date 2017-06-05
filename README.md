@@ -7,8 +7,8 @@ Introduction
 In this repository we provide Matlab implementation of coreset algorithms, used
 for evaluation in following paper:
 
-> ** k-Means for Streaming and Distributed Big Sparse Data **
-> Artem Barger, and Dan Feldman
+> **k-Means for Streaming and Distributed Big Sparse Data.**
+> *Artem Barger, and Dan Feldman.*
 > Proceedings of the 2016 SIAM International Conference on Data
 > Mining. Society for Industrial and Applied Mathematics, 2016.
 
