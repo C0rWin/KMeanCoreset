@@ -24,6 +24,32 @@ We provide implemenation for three algorithms used in the paper above:
 Detailed Usage / API
 ---
 
+1. Matrix
+
+Matrix abstraction which encapsulates a set of `P` points of `n` in `R^d` in
+matrix of size `n-by-d`.
+
+2. PointFunctionSet
+
+Class which represent weighted point set, in terms of function which maps point
+into real value (weight).
+
+3. Uniform coreset - `uniformCoreset.m`
+
+Implementation of uniform "naive" coreset sampling, with following API's
+
+```
+coresetSize = 100
+
+algorithm = uniformCorest(coresetSize)
+
+% Compute coreset of n points from R^d
+coreset1 = algorithm.computeCoreset(P1)
+coreset2 = algorithm.computeCoreset(P1)
+
+% Merge two coresets into new one
+coreset = algorithm.mergedCoreset(coreset1, coreset2)
+```
 
 Feedback
 ---
