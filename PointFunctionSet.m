@@ -8,8 +8,8 @@ classdef PointFunctionSet < AbstractFunctionSet
         % Weights of the points. Vector of n elements.
         % NOTE: W is n-by-1 vector.
         % Type = Matrix
-        W=Matrix();
-
+        W=Matrix(); 
+        
         % Type =  real
         com; % center of mass for addDim
         highVal=realmax;
@@ -18,7 +18,7 @@ classdef PointFunctionSet < AbstractFunctionSet
         sumW;
         n;
     end % properties (Dependent)
-
+    
     methods
         function [Q idxs]=epsilonGrid (obj, epsilon, G)
             %[~, idxs] = obj.M.epsilonGrid(epsilon, G.M);
@@ -38,7 +38,7 @@ classdef PointFunctionSet < AbstractFunctionSet
                 result=sum(obj.W.m);
             end
         end
-
+        
         % Instantiate new object of the same class.
         function new=copy(this)
            new = feval(class(this));
@@ -46,7 +46,7 @@ classdef PointFunctionSet < AbstractFunctionSet
         end
         function copyToExistent(obj, other)
            obj.M=Matrix(other.M.m);
-           obj.W=Matrix(other.W.m);
+           obj.W=Matrix(other.W.m); 
         end
         function addDim(obj)
             m=obj.M.m;
@@ -56,7 +56,7 @@ classdef PointFunctionSet < AbstractFunctionSet
             obj.M = Matrix([newM.m obj.highVal*ones(obj.M.n,1)]);
 %            obj.M = Matrix(bsxfun(@plus, obj.M.m(:,1:end-1), obj.com));
         end
-
+        
         function F=removeDim(obj)
             m=obj.M.m;
             last=obj.highVal./m(:,end);
@@ -64,7 +64,7 @@ classdef PointFunctionSet < AbstractFunctionSet
             obj.M = Matrix(bsxfun(@plus, newM, obj.com));
             F=obj;
         end
-
+        
         function result=isEmpty(obj)
             result= obj.M.n==0;
         end
@@ -87,22 +87,22 @@ classdef PointFunctionSet < AbstractFunctionSet
                 obj.W = varargin{1};
             end
         end
-
+               
         % Compute squared distance from obj (set of points) to centers
-        % Either set of points or cell of subspaces
+        % Either set of points or cell of subspaces        
 		% Both obj and centers are PointFunctionSet type.
         % We also return the indices that reach the minimum.
-
+        
         function [m argm]=maxDistance(obj,centers)
             sqDistances = obj.Eval(centers);
             [m2 argm]=max(sqDistances);
             m=sqrt(m2);
-        end
-
+        end            
+        
         function m=sumDistance(obj,centers)
             sqDistances = obj.Eval(centers);
             m=sum(sqrt(sqDistances));
-        end
+        end  
         % This function should just call centers.Eval.
         function [sqDistances indexes c] = Eval(obj, centers)
             if isa(centers, 'GISPoints')
@@ -117,7 +117,7 @@ classdef PointFunctionSet < AbstractFunctionSet
             elseif isa(centers,'Subspace')
                 % Compute squared distance from point in Matrix to subspace
                 sqDistances= obj.M.sqDistances(centers);
-
+            
                 %indexes is created to match for the abstract Eval, in clusters
                 %there are indexes for the nearest pointFunctionSet
                 indexes = ones(size(sqDistances,1),size(sqDistances,2));
@@ -128,29 +128,29 @@ classdef PointFunctionSet < AbstractFunctionSet
                 c.initWithFunctionSet(obj, 1:obj.size, sqDistances, centers, indexes);
             end
         end
-
+        
         function setSubset(obj, indexes, G)
             try
                 obj.M.m(indexes,:)=G.M.m;
-                obj.W.m(indexes,:)=G.W.m;
+                obj.W.m(indexes,:)=G.W.m; 
             catch
                 error('df')
             end
         end
-
+        
         % Return the subset (new copy) of matrix M consists of rows indexed by indexes
         function G = subset(obj, indexes)
           G=obj.copy();
           G.M=obj.M.getRows(indexes);
           G.W=obj.W.getRows(indexes);
         end
-
+        
         % Return a random subset of obj with size sampleSize
         function  S = randomSubset(obj, sampleSize, repetition)
-          [randM, randIndex] = obj.M.sampleRows(sampleSize,repetition);
+          [randM, randIndex] = obj.M.sampleRows(sampleSize,repetition);  
           S = PointFunctionSet(randM, obj.W.getRows(randIndex));
         end
-
+        
         %  Return a
         % subset of points in G with size sampleSize as the medians. The points are
         % sampled according to their weights in G.
@@ -163,14 +163,14 @@ classdef PointFunctionSet < AbstractFunctionSet
             copies = weights*sampleSize/sum(weights);
             sample=obj.subset(indexes);
         end
-
+            
         % Remove certain subset of points according to the indexes
         function result = remove(obj, mIndexes)
             rest = 1:obj.size;
             rest(mIndexes)=[];
             result = obj.subset(rest);
         end
-
+        
         % Merge two PointFunctionSets
         function obj = merge(obj, P2)
             obj.M.merge(P2.M);
@@ -195,13 +195,13 @@ classdef PointFunctionSet < AbstractFunctionSet
 %                 warning('Cannot merge pointsets with different in dimensions');
 %             end
         end %end merge
-
+        
         function clear(obj)
            obj.M.clear();
            obj.W.clear();
            obj.sumW = 0;
         end
-
+      
         function subspace = getSpannedSubspace(obj)
             subspace = obj.M.getSpannedSubspace();
         end
@@ -215,6 +215,6 @@ classdef PointFunctionSet < AbstractFunctionSet
         function show(obj, varargin)
             Utils.show('P', obj, 'func', 'plot3' ,'.',varargin{:});
         end % show
-
+                
     end % methods
 end
