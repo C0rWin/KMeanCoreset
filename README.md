@@ -144,6 +144,41 @@ result = stream.getUnifiedCorest()
 
 ```
 
+7. Evaluation
+
+Evaluation of results done with following code:
+
+```
+% Given kmeans results computed with coreset, we compute the value of energy
+% function, which is sum of squared distances to the kmeans centers and compare
+% with kmeans++ approximated solution for original dataset
+
+coresetSize = 100;
+% Number of kmeans++ iterations to execute for coreset construction
+maxIter = 10;
+
+algorithm = kmeansCorest(coresetSize, maxIter);
+
+% Compute coreset of n points from R^d
+coreset = algorithm.computeCoreset(P);
+
+% coreset results is of type PointFunctionSet, it has matrix which represents
+% coreset points and well matrix which actually holds weights of the points
+% computed by algorithm.
+
+[part, centers, ~, ~] = Ckmeans(coreset.M.m, k, coreset.W.m, 'distance', 'sqeuclidean', ...
+        'maxiter', 100, 'emptyaction', 'singleton', 'display', 'off', 'onlinephase', 'off');
+
+dist = zeros(size(obj.matrix, 1), obj.k);
+for c=1:obj.k
+    dist(:,c) = sum(bsxfun(@minus, P, centers(c,:)).^2, 2);
+end
+energy = sum(min(dist, [], 2));
+
+
+error = energy / optEnergy - 1
+```
+
 Feedback
 ---
 
