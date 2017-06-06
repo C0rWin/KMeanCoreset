@@ -21,7 +21,20 @@ We provide implemenation for three algorithms used in the paper above:
 2. Non-uniform corest (sensitivity based)
 3. Our algorithm (Deterministic coreset construction)
 
-Detailed Usage / API
+API
+---
+
+Coreset algorithms provides two very basic API's:
+
+* Given set of points P from `R^d`:
+
+`computeCoreset(P`) - compress points P into coreset the weighted set C
+
+* Given two coresets C1 and C2:
+
+`mergedCoreset(C1, C2)` - merges two coresets into a new one C'.
+
+Detailed Usage
 ---
 
 1. Matrix - `Matrix.m`
@@ -78,6 +91,57 @@ coreset2 = algorithm.computeCoreset(P1);
 
 % Merge two coresets into new one
 coreset = algorithm.mergedCoreset(coreset1, coreset2);
+```
+
+5. Determenistic coreset algorithm - `kmeansCoreset.m`
+
+Implementation of our determenistic kmeans coreset algorithm of size k^O(1).
+
+```
+coresetSize = 100;
+% Number of kmeans++ iterations to execute for coreset construction
+maxIter = 10;
+
+algorithm = kmeansCorest(coresetSize, maxIter);
+
+% Compute coreset of n points from R^d
+coreset1 = algorithm.computeCoreset(P1);
+coreset2 = algorithm.computeCoreset(P1);
+
+% Merge two coresets into new one
+coreset = algorithm.mergedCoreset(coreset1, coreset2);
+
+```
+
+6. Coresets streaming - `Stream.m`
+
+Stream encapsulates logic of building coreset merge-and-reduce tree and allow
+streaming computation of the coreset for continiously arriving points.
+
+Example of streaming:
+
+```
+
+% We will use kmeans coreset as an example here:
+
+coresetSize = 100;
+maxIter = 10;
+
+algorithm = kmeansCorest(coresetSize, maxIter);
+
+stream = Stream();
+stream.coresetAlg = algorithm;
+% Define coreset merge-and-reduce tree leaf size
+stream.leafSize = 100;
+
+% For each new batch of streaming points do:
+stream.addPointSet(P)
+
+% In order to get final coreset results, which is union of entire tree into
+final single coreset of given size.
+
+result = stream.getUnifiedCorest()
+
 ```
 
 Feedback
