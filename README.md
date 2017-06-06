@@ -144,7 +144,7 @@ result = stream.getUnifiedCorest()
 
 ```
 
-7. *Evaluation*
+7. **Evaluation**
 
 Evaluation of results done with following code:
 
