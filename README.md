@@ -17,9 +17,9 @@ Algorithms
 
 We provide implemenation for three algorithms used in the paper above:
 
-1. Uniform coreset
-2. Non-uniform corest (sensitivity based)
-3. Our algorithm (Deterministic coreset construction)
+1. *Uniform coreset*
+2. *Non-uniform corest (sensitivity based)*
+3. *Our algorithm (Deterministic coreset construction)*
 
 API
 ---
