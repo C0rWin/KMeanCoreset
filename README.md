@@ -5,7 +5,7 @@ Introduction
 ---
 
 In this repository we provide Matlab implementation of coreset algorithms, used
-for evaluation in following paper:
+for evaluation in following [paper](https://arxiv.org/pdf/1511.08990.pdf):
 
 > **k-Means for Streaming and Distributed Big Sparse Data.**
 > *Artem Barger, and Dan Feldman.*
@@ -17,9 +17,9 @@ Algorithms
 
 We provide implemenation for three algorithms used in the paper above:
 
-1. *Uniform coreset*
-2. *Non-uniform corest (sensitivity based)*
-3. *Our algorithm (Deterministic coreset construction)*
+1. **Uniform coreset**
+2. **Non-uniform corest (sensitivity based)**
+3. **Our algorithm (Deterministic coreset construction)**
 
 API
 ---
@@ -37,17 +37,17 @@ Coreset algorithms provides two very basic API's:
 Detailed Usage
 ---
 
-1. Matrix - `Matrix.m`
+1. **Matrix** - `Matrix.m`
 
 Matrix abstraction which encapsulates a set of `P` points of `n` in `R^d` in
 matrix of size `n-by-d`.
 
-2. PointFunctionSet - `PointFunctionSet.m`
+2. **PointFunctionSet** - `PointFunctionSet.m`
 
 Class which represent weighted point set, in terms of function which maps point
 into real value (weight).
 
-3. Uniform coreset - `uniformCoreset.m`
+3. **Uniform coreset** - `uniformCoreset.m`
 
 Implementation of uniform "naive" coreset sampling, with following API's
 
@@ -64,13 +64,13 @@ coreset2 = algorithm.computeCoreset(P1);
 coreset = algorithm.mergedCoreset(coreset1, coreset2);
 ```
 
-4. Non uniform coreset (sensitivity based) - `KMedianCoresetAlg.m`
+4. **Non uniform coreset (sensitivity based)** - `KMedianCoresetAlg.m`
 
 Implementation of sensitivity based coreset sampling - the non uniform, for
 both `k-means` and `k-median` algorithms. Algorithms uses bicriteria
 approximation for sensitivity computation.
 
-```
+```matlab
 coresetSize = 100
 
 algorithm = KMedianCoresetAlg();
@@ -93,11 +93,11 @@ coreset2 = algorithm.computeCoreset(P1);
 coreset = algorithm.mergedCoreset(coreset1, coreset2);
 ```
 
-5. Determenistic coreset algorithm - `kmeansCoreset.m`
+5. **Determenistic coreset algorithm** - `kmeansCoreset.m`
 
 Implementation of our determenistic kmeans coreset algorithm of size k^O(1).
 
-```
+```matlab
 coresetSize = 100;
 % Number of kmeans++ iterations to execute for coreset construction
 maxIter = 10;
@@ -113,14 +113,14 @@ coreset = algorithm.mergedCoreset(coreset1, coreset2);
 
 ```
 
-6. Coresets streaming - `Stream.m`
+6. *Coresets streaming* - `Stream.m`
 
 Stream encapsulates logic of building coreset merge-and-reduce tree and allow
 streaming computation of the coreset for continiously arriving points.
 
 Example of streaming:
 
-```
+```matlab
 
 % We will use kmeans coreset as an example here:
 
@@ -144,11 +144,11 @@ result = stream.getUnifiedCorest()
 
 ```
 
-7. Evaluation
+7. *Evaluation*
 
 Evaluation of results done with following code:
 
-```
+```matlab
 % Given kmeans results computed with coreset, we compute the value of energy
 % function, which is sum of squared distances to the kmeans centers and compare
 % with kmeans++ approximated solution for original dataset
@@ -174,7 +174,6 @@ for c=1:obj.k
     dist(:,c) = sum(bsxfun(@minus, P, centers(c,:)).^2, 2);
 end
 energy = sum(min(dist, [], 2));
-
 
 error = energy / optEnergy - 1
 ```
