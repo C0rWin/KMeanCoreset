@@ -169,8 +169,8 @@ coreset = algorithm.computeCoreset(P);
 [part, centers, ~, ~] = Ckmeans(coreset.M.m, k, coreset.W.m, 'distance', 'sqeuclidean', ...
         'maxiter', 100, 'emptyaction', 'singleton', 'display', 'off', 'onlinephase', 'off');
 
-dist = zeros(size(obj.matrix, 1), obj.k);
-for c=1:obj.k
+dist = zeros(size(P, 1), k);
+for c=1:k
     dist(:,c) = sum(bsxfun(@minus, P, centers(c,:)).^2, 2);
 end
 energy = sum(min(dist, [], 2));
