@@ -51,7 +51,7 @@ into real value (weight).
 
 Implementation of uniform "naive" coreset sampling, with following API's
 
-```
+```matlab
 coresetSize = 100;
 
 algorithm = uniformCorest(coresetSize);
